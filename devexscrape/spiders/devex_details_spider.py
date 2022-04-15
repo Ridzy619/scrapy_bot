@@ -17,7 +17,6 @@ class DevexDetailsSpider(scrapy.Spider):
     def start_requests(self):
         start_url = "https://www.devex.com/api/public/search/companies?page[number]=1&page[size]=1"
         scrapy.Request(start_url, callback=self.parse, headers=DEFAULT_REQUEST_HEADERS)
-        sleep(2)
         urls = (f'https://www.devex.com/api/public/search/companies?page[size]={self.size}&page[number]={n}' for n in range(
             1, ceil(self.total/self.size)+1))
         for url in urls:
