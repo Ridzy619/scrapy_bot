@@ -4,7 +4,10 @@ from math import ceil
 
 from devexscrape.items import OrgInfoItem
 
-
+DEFAULT_REQUEST_HEADERS = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36",
+        "Accept-Language": "en-US,en;q=0.9"
+    }
 class DevexDetailsSpider(scrapy.Spider):
     name = "devex_details"
     size = 100
@@ -13,12 +16,12 @@ class DevexDetailsSpider(scrapy.Spider):
 
     def start_requests(self):
         start_url = "https://www.devex.com/api/public/search/companies?page[number]=1&page[size]=1"
-        scrapy.Request(start_url, callback=self.parse)
+        scrapy.Request(start_url, callback=self.parse, headers=DEFAULT_REQUEST_HEADERS)
         sleep(2)
         urls = (f'https://www.devex.com/api/public/search/companies?page[size]={self.size}&page[number]={n}' for n in range(
             1, ceil(self.total/self.size)+1))
         for url in urls:
-            yield scrapy.Request(url=url, callback=self.parse_urls)
+            yield scrapy.Request(url=url, callback=self.parse_urls, headers=DEFAULT_REQUEST_HEADERS)
 
     def parse(self, response):
         self.total = 20 or int(response.json()["total"])
@@ -41,7 +44,7 @@ class DevexDetailsSpider(scrapy.Spider):
                 "organization_types": organization_types,
                 "staff": staff,
             }
-            yield scrapy.Request(url, callback=self.parse_detail_page, cb_kwargs=kwargs)
+            yield scrapy.Request(url, callback=self.parse_detail_page, cb_kwargs=kwargs, headers=DEFAULT_REQUEST_HEADERS)
 
     def parse_detail_page(self, response, cb_kwargs):
         founded = response.xpath(
