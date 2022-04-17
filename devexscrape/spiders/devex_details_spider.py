@@ -76,13 +76,13 @@ class DevexDetailsSpider(scrapy.Spider):
         if org_snapshot:
             org_snapshot = org_snapshot[0]
             sectors = ",".join(org_snapshot.xpath(
-                '//h2[text()="Sectors"]//following-sibling::ul/li/span/text()').get_all())
+                '//h2[text()="Sectors"]//following-sibling::ul/li/span/text()').getall())
             funders = ",".join(org_snapshot.xpath(
-                '//h2[text()="Funders"]//following-sibling::ul/li/span/text()').get_all())
+                '//h2[text()="Funders"]//following-sibling::ul/li/span/text()').getall())
             countries = ",".join(org_snapshot.xpath(
-                '//h2[text()="Countries"]//following-sibling::ul/li/span/text()').get_all())
+                '//h2[text()="Countries"]//following-sibling::ul/li/span/text()').getall())
             skills = ",".join(org_snapshot.xpath(
-                '//h2[text()="Skills"]//following-sibling::ul/li/span/text()').get_all())
+                '//h2[text()="Skills"]//following-sibling::ul/li/span/text()').getall())
             cb_kwargs.update({
                 "sectors": sectors,
                 "funders": funders,
