@@ -64,7 +64,7 @@ class DevexDetailsSpider(scrapy.Spider):
         headquarters = response.xpath(
             '//ul[@class="org-info list-unstyled"]/li[span="Headquarters"]/strong/a/text()').get()
         website_url = response.xpath(
-            '//small[@class="organization-website"]/a/@href')
+            '//small[@class="organization-website"]/a/@href').get()
         cb_kwargs.update({
             "founded": founded,
             "dev_budget": dev_budget,
