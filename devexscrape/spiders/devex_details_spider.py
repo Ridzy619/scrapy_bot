@@ -34,7 +34,7 @@ class DevexDetailsSpider(scrapy.Spider):
 
     def parse(self, response):
         response_json = json.loads(response.text)
-        self.total = 20 or response_json["total"]
+        self.total = int(response_json["total"])
         urls = (f'https://www.devex.com/api/public/search/companies?page[size]={self.size}&page[number]={n}' for n in range(
             1, ceil(self.total/self.size)+1))
         for url in urls:
@@ -103,24 +103,3 @@ class DevexDetailsSpider(scrapy.Spider):
             yield ContractItem({"company_name": cb_kwargs["name"],
                                 "contract_name": contract_name,
                                 "contract_fundier": contract_fundier})
-
-#  Use the Company Name as the unique identifier
-# - Contract Name,
-# - Contract Fundier, e.g. Bill and Melinda Gates Foundation
-
-
-# Company Name
-# - Company Logo
-# - Company Description
-# - Organization Type
-# - Staff
-# - Development Budget
-# - Headquarters
-# - Founded
-# - website link
-
-# Sectors, comma separated in one column
-# Funded, comma separated in one column
-# Countries, comma separated in one column
-# Skills, comma separated in one column
-# //h3[text()="Contract Awards "]//following-sibling::div
