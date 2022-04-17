@@ -97,13 +97,12 @@ class DevexDetailsSpider(scrapy.Spider):
 
         contract_names = response.xpath(
             '//div[@class="row margin-top-medium org-awards"]/div/div/h4/a/text()').getall()
-        contract_fundiers = response.xpath('//div[@class="row margin-top-medium org-awards"]/div/div/div/em/text()').getall()
+        contract_fundiers = response.xpath(
+            '//div[@class="row margin-top-medium org-awards"]/div/div/div/em/text()').getall()
         for contract_name, contract_fundier in zip(contract_names, contract_fundiers):
-            ContractItem["company_name"] = cb_kwargs["name"]
-            ContractItem["contract_name"] = contract_name
-            ContractItem["contract_fundier"] = contract_fundier
-
-            yield ContractItem
+            yield ContractItem({"company_name": cb_kwargs["name"],
+                                "contract_name": contract_name,
+                                "contract_fundier": contract_fundier})
 
 #  Use the Company Name as the unique identifier
 # - Contract Name,
