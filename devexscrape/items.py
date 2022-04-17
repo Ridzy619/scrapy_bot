@@ -23,7 +23,7 @@ class OrgInfoItem(scrapy.Item):
     countries = scrapy.Field()
     skills = scrapy.Field()
     
-class ContractsItem(scrapy.Item):
+class ContractItem(scrapy.Item):
     company_name = scrapy.Field()
     contract_name = scrapy.Field()
     contract_fundier = scrapy.Field()

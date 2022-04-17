@@ -3,24 +3,26 @@ import scrapy
 from math import ceil
 import json
 
-from devexscrape.items import OrgInfoItem
+from devexscrape.items import OrgInfoItem, ContractItem
 
 DEFAULT_REQUEST_HEADERS = {
-    "Referer": "https://google.com/", 
-    "Accept": "application/xhtml+xml,application/xml", 
-    "Accept-Encoding": "gzip, deflate, br", 
-    "Accept-Language": "en-US,en;q=0.9,ar-EG;q=0.8,ar;q=0.7", 
-    "Dnt": "1", 
-    "Sec-Ch-Ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"100\", \"Google Chrome\";v=\"100\"", 
-    "Sec-Ch-Ua-Mobile": "?0", 
-    "Sec-Ch-Ua-Platform": "\"macOS\"", 
-    "Sec-Fetch-Dest": "document", 
-    "Sec-Fetch-Mode": "navigate", 
-    "Sec-Fetch-Site": "cross-site", 
-    "Sec-Fetch-User": "?1", 
-    "Upgrade-Insecure-Requests": "1", 
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36", 
-    }
+    "Referer": "https://google.com/",
+    "Accept": "application/xhtml+xml,application/xml",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Accept-Language": "en-US,en;q=0.9,ar-EG;q=0.8,ar;q=0.7",
+    "Dnt": "1",
+    "Sec-Ch-Ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"100\", \"Google Chrome\";v=\"100\"",
+    "Sec-Ch-Ua-Mobile": "?0",
+    "Sec-Ch-Ua-Platform": "\"macOS\"",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "cross-site",
+    "Sec-Fetch-User": "?1",
+    "Upgrade-Insecure-Requests": "1",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36",
+}
+
+
 class DevexDetailsSpider(scrapy.Spider):
     name = "devex_details"
     size = 10
@@ -93,6 +95,16 @@ class DevexDetailsSpider(scrapy.Spider):
 
         yield OrgInfoItem(**cb_kwargs)
 
+        contract_names = response.xpath(
+            '//div[@class="row margin-top-medium org-awards"]/div/div/h4/a/text()').getall()
+        contract_fundiers = response.xpath('//div[@class="row margin-top-medium org-awards"]/div/div/div/em/text()').getall()
+        for contract_name, contract_fundier in zip(contract_names, contract_fundiers):
+            ContractItem["company_name"] = cb_kwargs["name"]
+            ContractItem["contract_name"] = contract_name
+            ContractItem["contract_fundier"] = contract_fundier
+
+            yield ContractItem
+
 #  Use the Company Name as the unique identifier
 # - Contract Name,
 # - Contract Fundier, e.g. Bill and Melinda Gates Foundation
@@ -112,3 +124,4 @@ class DevexDetailsSpider(scrapy.Spider):
 # Funded, comma separated in one column
 # Countries, comma separated in one column
 # Skills, comma separated in one column
+# //h3[text()="Contract Awards "]//following-sibling::div
