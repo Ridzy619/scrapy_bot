@@ -1,33 +1,44 @@
 from time import sleep
 import scrapy
 from math import ceil
+import json
 
 from devexscrape.items import OrgInfoItem
 
 DEFAULT_REQUEST_HEADERS = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36",
-        "Accept-Language": "en-US,en;q=0.9"
+    "Accept": "application/xhtml+xml,application/xml", 
+    "Accept-Encoding": "gzip, deflate, br", 
+    "Accept-Language": "en-US,en;q=0.9,ar-EG;q=0.8,ar;q=0.7", 
+    # "Dnt": "1", 
+    # "Sec-Ch-Ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"100\", \"Google Chrome\";v=\"100\"", 
+    # "Sec-Ch-Ua-Mobile": "?0", 
+    # "Sec-Ch-Ua-Platform": "\"macOS\"", 
+    # "Sec-Fetch-Dest": "document", 
+    # "Sec-Fetch-Mode": "navigate", 
+    # "Sec-Fetch-Site": "cross-site", 
+    # "Sec-Fetch-User": "?1", 
+    "Upgrade-Insecure-Requests": "1", 
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36", 
     }
 class DevexDetailsSpider(scrapy.Spider):
     name = "devex_details"
-    size = 100
-    total = 20
+    size = 10
     base = "https://www.devex.com/organizations/"
 
     def start_requests(self):
         start_url = "https://www.devex.com/api/public/search/companies?page[number]=1&page[size]=1"
-        scrapy.Request(start_url, callback=self.parse, headers=DEFAULT_REQUEST_HEADERS)
+        yield scrapy.Request(start_url, callback=self.parse)
+
+    def parse(self, response):
+        response_json = json.loads(response.text)
+        self.total = 20 or response_json["total"]
         urls = (f'https://www.devex.com/api/public/search/companies?page[size]={self.size}&page[number]={n}' for n in range(
             1, ceil(self.total/self.size)+1))
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse_urls, headers=DEFAULT_REQUEST_HEADERS)
 
-    def parse(self, response):
-        self.total = 20 or int(response.json()["total"])
-        print(self.total)
-
     def parse_urls(self, response):
-        json_data = response.json()["data"]
+        json_data = json.loads(response.text)["data"]
 
         for org in json_data:
             url = self.base + org["slug_and_id"]
@@ -45,7 +56,7 @@ class DevexDetailsSpider(scrapy.Spider):
             }
             yield scrapy.Request(url, callback=self.parse_detail_page, cb_kwargs=kwargs, headers=DEFAULT_REQUEST_HEADERS)
 
-    def parse_detail_page(self, response, cb_kwargs):
+    def parse_detail_page(self, response, **cb_kwargs):
         founded = response.xpath(
             '//ul[@class="org-info list-unstyled"]/li[span="Founded"]/strong/text()').get()
         dev_budget = response.xpath(
