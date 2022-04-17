@@ -25,7 +25,7 @@ DEFAULT_REQUEST_HEADERS = {
 
 class DevexDetailsSpider(scrapy.Spider):
     name = "devex_details"
-    size = 10
+    size = 10000
     base = "https://www.devex.com/organizations/"
     cache_base = "http://webcache.googleusercontent.com/search?q=cache:"
     handle_httpstatus_list = [403]
@@ -51,7 +51,7 @@ class DevexDetailsSpider(scrapy.Spider):
             name = org["name"]
             logo_url = org["logo_url"]
             description = org["description"]
-            organization_types = org["organization_types"]
+            organization_types = ",".join(org["organization_types"])
             staff = org["organization_size"]
             kwargs = {
                 "name": name,
