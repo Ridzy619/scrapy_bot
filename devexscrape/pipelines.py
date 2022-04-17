@@ -14,7 +14,7 @@ class DevexscrapePipeline:
         item_name = type(item).__name__
         self.exporters[item_name].export_item(item)
 
-        return item
+        # return item
 
     def open_spider(self, spider):
         self.files = {
