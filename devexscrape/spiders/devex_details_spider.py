@@ -28,6 +28,7 @@ class DevexDetailsSpider(scrapy.Spider):
     size = 10
     base = "https://www.devex.com/organizations/"
     cache_base = "http://webcache.googleusercontent.com/search?q=cache:"
+    handle_httpstatus_list = [403]
 
     def start_requests(self):
         start_url = "https://www.devex.com/api/public/search/companies?page[number]=1&page[size]=1"
@@ -59,9 +60,12 @@ class DevexDetailsSpider(scrapy.Spider):
                 "organization_types": organization_types,
                 "staff": staff,
             }
-            yield scrapy.Request(url, callback=self.parse_detail_page, cb_kwargs=kwargs, headers=DEFAULT_REQUEST_HEADERS, errback=self.err_parse_detail_page)
+            yield scrapy.Request(url, callback=self.parse_detail_page, cb_kwargs=kwargs, headers=DEFAULT_REQUEST_HEADERS)
 
     def parse_detail_page(self, response, **cb_kwargs):
+        if response.status==403:
+            response.url = self.cache_base+response.url
+            yield scrapy.Request(response.url, callback=self.parse_detail_page, cb_kwargs=cb_kwargs)
         founded = response.xpath(
             '//ul[@class="org-info list-unstyled"]/li[span="Founded"]/strong/text()').get()
         dev_budget = response.xpath(
@@ -105,8 +109,3 @@ class DevexDetailsSpider(scrapy.Spider):
             yield ContractItem({"company_name": cb_kwargs["name"],
                                 "contract_name": contract_name,
                                 "contract_fundier": contract_fundier})
-
-    def err_parse_detail_page(self, failure, **cb_kwargs):
-        if failure.status == 403:
-            failure.url = self.cache_base+failure.url
-            yield scrapy.Request(failure.url, callback=self.parse_detail_page, cb_kwargs=cb_kwargs)
