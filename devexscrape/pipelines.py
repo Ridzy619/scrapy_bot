@@ -11,8 +11,9 @@ from devexscrape.items import OrgInfoItem, ContractItem
 
 class DevexscrapePipeline:
     def process_item(self, item, spider):
-        self.exporters[item.__name__].export_item(item)
-        
+        item_name = type(item).__name__
+        self.exporters[item_name].export_item(item)
+
         return item
 
     def open_spider(self, spider):
