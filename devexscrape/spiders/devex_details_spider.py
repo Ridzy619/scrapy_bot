@@ -64,8 +64,8 @@ class DevexDetailsSpider(scrapy.Spider):
 
     def parse_detail_page(self, response, **cb_kwargs):
         if response.status==403:
-            response.url = self.cache_base+response.url
-            yield scrapy.Request(response.url, callback=self.parse_detail_page, cb_kwargs=cb_kwargs)
+            url = self.cache_base+response.url
+            yield scrapy.Request(url, callback=self.parse_detail_page, cb_kwargs=cb_kwargs)
         founded = response.xpath(
             '//ul[@class="org-info list-unstyled"]/li[span="Founded"]/strong/text()').get()
         dev_budget = response.xpath(
