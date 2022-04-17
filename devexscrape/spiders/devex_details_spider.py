@@ -31,7 +31,7 @@ class DevexDetailsSpider(scrapy.Spider):
 
     def start_requests(self):
         start_url = "https://www.devex.com/api/public/search/companies?page[number]=1&page[size]=1"
-        yield scrapy.Request(start_url, callback=self.parse, errback=self.err_parse)
+        yield scrapy.Request(start_url, callback=self.parse)
         
 
     def parse(self, response):
