@@ -2,10 +2,17 @@
 
 ## How to Run
 
-After cloning the project, cd into **scrapy_bot** folder and do the following
-- `python -m venv env`
-- `source activate env`
+After cloning the project, cd into **scrapy_bot** folder and do the following:
+
+> If using pip, do:
+- `python -m venv commonshare-env`
+- `source activate commonshare-env`
 - `pip install -r requirements.txt`
+- `scrapy crawl devex_details`
+
+> If using conda, do:
+- `conda env create -f environment.yml`
+- `conda activate commonshare-env`
 - `scrapy crawl devex_details`
 
 ## Brief Description
